@@ -1,11 +1,13 @@
 package group35;
 
-public class Token {
-    State[] states;
+import java.io.Serializable;
+
+public class Token implements Serializable {
+    NodeState[] nodeStates;
     int[] requestNumbers;
 
     public Token(int numberOfProcesses) {
-        states = new State[numberOfProcesses];
+        nodeStates = new NodeState[numberOfProcesses];
         requestNumbers = new int[numberOfProcesses];
     }
 }
