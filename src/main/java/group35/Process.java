@@ -6,7 +6,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
 import java.util.Random;
 
-public class Process extends Thread implements Node, Serializable {
+public class Process implements Node, Serializable, Runnable {
     private final NodeState[] states;
     private final int[] requestNumbers;
     private int id;
@@ -37,14 +37,14 @@ public class Process extends Thread implements Node, Serializable {
         // Become active after some time
         Random random = new Random();
         try {
-            Thread.sleep(random.nextInt(5000));
+            Thread.sleep(random.nextInt(50));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         requestAccess();
         while(!workComplete) {
             try {
-                Thread.sleep(1000);
+                Thread.sleep(10);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -101,7 +101,7 @@ public class Process extends Thread implements Node, Serializable {
             Node receiver = (Node) registry.lookup("p" + id);
             Runnable send = () -> {
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(10);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -126,7 +126,7 @@ public class Process extends Thread implements Node, Serializable {
             requestNumbers[id - 1] += 1;
             Runnable sendRequest = () -> {
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(10);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -170,7 +170,7 @@ public class Process extends Thread implements Node, Serializable {
     private void criticalSection() {
         System.out.println(id + ": --> Entering critical section");
         try {
-            Thread.sleep(3000);
+            Thread.sleep(30);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
