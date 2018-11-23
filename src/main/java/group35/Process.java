@@ -41,8 +41,8 @@ public class Process extends Thread implements Node, Serializable {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        requestAccess();
         while(!workComplete) {
-            requestAccess();
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
@@ -74,20 +74,18 @@ public class Process extends Thread implements Node, Serializable {
     public void receiveRequest(int requesterId, final int requestNumber) {
 //        System.out.println(id + ": Receiving request for token from " + requesterId);
         requestNumbers[requesterId - 1] = requestNumber;
+        states[requesterId - 1] = NodeState.REQUESTING;
         switch (states[id - 1]) { // get own state
             case EXECUTING:
             case OTHER:
 //                System.out.println(id + ": Case E/O");
-                states[requesterId - 1] = NodeState.REQUESTING;
                 break;
             case REQUESTING:
 //                System.out.println(id + ": Case R");
-                states[requesterId - 1] = NodeState.REQUESTING;
                 sendRequest(requesterId);
                 break;
             case HOLDING:
 //                System.out.println(id + ": Case H");
-                states[requesterId - 1] = NodeState.REQUESTING;
                 states[id - 1] = NodeState.OTHER;
                 // update token with state and requestNumber
                 token.nodeStates[requesterId-1] = NodeState.REQUESTING;
@@ -151,7 +149,7 @@ public class Process extends Thread implements Node, Serializable {
         criticalSection();
         states[id - 1] = NodeState.OTHER;
         token.nodeStates[id - 1] = NodeState.OTHER;
-        for(int j = 0; j < id - 2; j++) {
+        for(int j = 0; j < numberOfProcesses; j++) {
             if(requestNumbers[j] > token.requestNumbers[j]) {
                 token.requestNumbers[j] = requestNumbers[j];
                 token.nodeStates[j] = states[j];
@@ -160,7 +158,7 @@ public class Process extends Thread implements Node, Serializable {
                 states[j] = token.nodeStates[j];
             }
         }
-        for(int j = 0; j < id - 2; j++) {
+        for(int j = 0; j < numberOfProcesses; j++) {
             if(states[j] == NodeState.REQUESTING) {
                 sendToken(j + 1);
                 return;
